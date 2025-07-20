@@ -65,7 +65,9 @@ int main(int argc , char * argv[])
 	printf("Connected to Server\n");
 	for(;;)
 	{
-			
+		printf("Enter the Message \n");
+		fgets(aBuffer,BUFFLEN,stdin);
+		send(iClientFd,aBuffer,strlen(aBuffer),0);		
 	}
 
 

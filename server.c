@@ -9,18 +9,21 @@
 //File for sockets api and structures
 #include <sys/socket.h>
 #include <netinet/in.h>
+   #include <arpa/inet.h>
 
 //Files for i/o operation and system information
 #include <string.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
 
 //Macros
 
 #define SERVPORT  5000
 #define BUFFERLEN 1024	
-#define CLIENTQ 8 //The number of clients will be in queue while the server is busy
+#define CLIENTQ 4 //The number of clients will be in queue while the server is busy
 
 int main(int argc, char * argv[])
 {
@@ -32,12 +35,14 @@ int main(int argc, char * argv[])
 	int32_t iClientFd = 0;
 	int32_t iServerFd = 0;
 	int32_t iAgentFd = 0;
-
+	pid_t  iProcess;
 	//Buffer for storing data
 	char aBuffer[BUFFERLEN];
-	
+	int8_t iRecievedByte =0 ;
 	//Client socket length 
 	socklen_t iClientSocLen;
+
+	
 	//Fill the Server Structure with its element i.e. Socket type,ipaddress, port number
 	ServerAddr.sin_family = AF_INET;
 	ServerAddr.sin_addr.s_addr = INADDR_ANY;
@@ -59,10 +64,25 @@ int main(int argc, char * argv[])
 	printf("\nWaiting for Client......\n");
 	for(;;)
 	{
-		printf("Reached here\n");
 		iClientSocLen = sizeof(ClientAddr);
-
 		iAgentFd = accept(iServerFd,(struct sockaddr *)&ClientAddr,&iClientSocLen);
-		printf("Connection Successfull");
+
+		iProcess = fork();
+		if(iProcess  == 0 )
+		{
+		printf("Client connected: %s:%d\n",inet_ntoa(ClientAddr.sin_addr),ntohs(ClientAddr.sin_port));
+
+		while( (iRecievedByte = recv(iAgentFd,aBuffer,BUFFERLEN - 1,0)) > 0)
+		{	
+			aBuffer[strlen(aBuffer) - 1] = '\0';
+			printf("Recieved Message is %s\n",aBuffer);
+			memset(aBuffer,0,BUFFERLEN);
+		}
+		if(iRecievedByte < 1)
+		{
+		printf("Client disconnected: %s:%d\n",inet_ntoa(ClientAddr.sin_addr),ntohs(ClientAddr.sin_port));
+		exit(0);
+		}
+		}
 	}	
 }
