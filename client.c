@@ -56,14 +56,17 @@ int main(int argc , char * argv[])
 	
 
 	//Connect to server
-	if(connect(iClientFd,(struct sockaddr*)&ServerAddr, sizeof(ServerAddr)) == -1 )
+	if(connect(iClientFd,(struct sockaddr*)&ServerAddr, sizeof(ServerAddr)) < 0 )
 	{
 		perror("Connection failed\n");
 		close(iClientFd);
 		exit(EXIT_FAILURE);
 	}
 	printf("Connected to Server\n");
-
+	for(;;)
+	{
+			
+	}
 
 
 }

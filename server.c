@@ -59,8 +59,10 @@ int main(int argc, char * argv[])
 	printf("\nWaiting for Client......\n");
 	for(;;)
 	{
+		printf("Reached here\n");
 		iClientSocLen = sizeof(ClientAddr);
-		iAgentFd = accept(iServerFd,(struct sockaddr *)&ClientAddr,&iClientSocLen);
 
-}	
+		iAgentFd = accept(iServerFd,(struct sockaddr *)&ClientAddr,&iClientSocLen);
+		printf("Connection Successfull");
+	}	
 }
