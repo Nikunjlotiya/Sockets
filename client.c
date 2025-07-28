@@ -27,7 +27,7 @@ int main(int argc , char * argv[])
 	//Creating a Structure element of socket structure
 	struct sockaddr_in ClientAddr;//Structure which stores the Client IP and PORT while creating client 
 	struct sockaddr_in ServerAddr;//Structure which stores the server IP and PORT after connection
-	
+
 	//Created Sockets descriptor
 	int32_t iClientFd = 0;
 	int32_t iServerFd = 0;
@@ -42,18 +42,26 @@ int main(int argc , char * argv[])
 
 	iClientFd = socket(AF_INET,SOCK_STREAM,0);
 
+	// Enable SO_REUSEADDR
+    	int opt = 1;
+    	if (setsockopt(iClientFd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1) 
+	{
+		perror("Setsockopt failed");
+		close(iClientFd);
+		exit(EXIT_FAILURE);
+	}
 	if(bind(iClientFd,(struct sockaddr *)&ClientAddr,sizeof(ClientAddr))  < 0)
 	{
 		perror("Socket can't bind to PORT");
 		close(iClientFd);
 		exit(EXIT_FAILURE);
 	}
-	
+
 	//Fill the Server Structure with its element i.e. Socket type,ipaddress, port number
-        ServerAddr.sin_family = AF_INET;
-        ServerAddr.sin_addr.s_addr = inet_addr(argv[2]);
-        ServerAddr.sin_port = htons(SERVPORT);
-	
+	ServerAddr.sin_family = AF_INET;
+	ServerAddr.sin_addr.s_addr = inet_addr(argv[2]);
+	ServerAddr.sin_port = htons(SERVPORT);
+
 
 	//Connect to server
 	if(connect(iClientFd,(struct sockaddr*)&ServerAddr, sizeof(ServerAddr)) < 0 )
@@ -68,6 +76,10 @@ int main(int argc , char * argv[])
 		printf("Enter the Message \n");
 		fgets(aBuffer,BUFFLEN,stdin);
 		send(iClientFd,aBuffer,strlen(aBuffer),0);		
+		memset(aBuffer,0,BUFFLEN);
+		recv(iClientFd,aBuffer,BUFFLEN,0);
+		printf("%s",aBuffer);
+		memset(aBuffer,0,BUFFLEN);
 	}
 
 
