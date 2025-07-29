@@ -1,8 +1,8 @@
 /*The Client code with the following feature :
- > Request the server for connection 
- > The client socket will be created using the USER DEFINED PORT NUMBER
- > Client can send as well as recieve message from server
-*/
+  > Request the server for connection 
+  > The client socket will be created using the USER DEFINED PORT NUMBER
+  > Client can send as well as recieve message from server
+  */
 
 //The header file for the socket
 #include <netinet/in.h>
@@ -43,8 +43,8 @@ int main(int argc , char * argv[])
 	iClientFd = socket(AF_INET,SOCK_STREAM,0);
 
 	// Enable SO_REUSEADDR
-    	int opt = 1;
-    	if (setsockopt(iClientFd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1) 
+	int opt = 1;
+	if (setsockopt(iClientFd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1) 
 	{
 		perror("Setsockopt failed");
 		close(iClientFd);
@@ -75,12 +75,20 @@ int main(int argc , char * argv[])
 	{
 		printf("Enter the Message \n");
 		fgets(aBuffer,BUFFLEN,stdin);
-		send(iClientFd,aBuffer,strlen(aBuffer),0);		
+		send(iClientFd,aBuffer,strlen(aBuffer),0);
 		memset(aBuffer,0,BUFFLEN);
-		recv(iClientFd,aBuffer,BUFFLEN,0);
-		printf("%s",aBuffer);
-		memset(aBuffer,0,BUFFLEN);
+		if( recv(iClientFd,aBuffer,BUFFLEN,0) > 0)
+		{
+			printf("%s\n",aBuffer);
+			memset(aBuffer,0,BUFFLEN);
+		}
+		else
+		{
+			printf("Server Disconnected\n");
+			exit(0);
+		}
 	}
+
 
 
 }
